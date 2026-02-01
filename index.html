@@ -283,6 +283,8 @@
   // No button starts static inside flex — sits beside Yes naturally.
   // On first dodge we pull it out into position:fixed so it can jump freely.
   let escaped = false;
+  let cachedBtnW = 0;
+  let cachedBtnH = 0;
 
   // ── track mouse position globally ──
   let mouseX = window.innerWidth / 2;
@@ -303,26 +305,35 @@
     if(now - lastDodgeTime < 150) return;
     lastDodgeTime = now;
 
-    // first dodge: switch from static (flex) to fixed (viewport) 
+    // first dodge: cache the button size BEFORE switching to fixed.
+    // After position:fixed, offsetWidth can momentarily return 0.
     if(!escaped){
       escaped = true;
+      cachedBtnW = btnNo.offsetWidth;
+      cachedBtnH = btnNo.offsetHeight;
       btnNo.style.position = 'fixed';
     }
 
     attempts++;
 
-    const btnW   = btnNo.offsetWidth;
-    const btnH   = btnNo.offsetHeight;
-    const vW     = window.innerWidth;
-    const vH     = window.innerHeight;
-    const margin = 16;
-    const minDist = 300;
+    const btnW    = cachedBtnW || btnNo.offsetWidth || 100;
+    const btnH    = cachedBtnH || btnNo.offsetHeight || 46;
+    const vW      = window.innerWidth;
+    const vH      = window.innerHeight;
+    const margin  = 20;
+    const minDist = 250;
+
+    // absolute safe bounds — button can never go outside these
+    const safeMinX = margin;
+    const safeMaxX = vW - btnW - margin;
+    const safeMinY = margin;
+    const safeMaxY = vH - btnH - margin;
 
     let x, y, tries = 0;
 
     do {
-      x = margin + Math.random() * (vW - btnW - margin * 2);
-      y = margin + Math.random() * (vH - btnH - margin * 2);
+      x = safeMinX + Math.random() * (safeMaxX - safeMinX);
+      y = safeMinY + Math.random() * (safeMaxY - safeMinY);
 
       const cx   = x + btnW / 2;
       const cy   = y + btnH / 2;
@@ -330,7 +341,11 @@
 
       tries++;
       if(dist >= minDist) break;
-    } while(tries < 30);
+    } while(tries < 50);
+
+    // HARD CLAMP — forces inside viewport no matter what the loop produced
+    x = Math.max(safeMinX, Math.min(x, safeMaxX));
+    y = Math.max(safeMinY, Math.min(y, safeMaxY));
 
     btnNo.style.left = x + 'px';
     btnNo.style.top  = y + 'px';
