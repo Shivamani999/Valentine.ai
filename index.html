@@ -120,9 +120,9 @@
   .btn-no {
     background: var(--blush); color: var(--rose-dark);
     box-shadow: 0 2px 10px rgba(0,0,0,.08);
-    position: fixed;  /* fixed to viewport so it can jump anywhere on screen */
+    position: static; /* starts in normal flex flow, beside Yes */
     z-index: 10;
-    transition: left .15s ease, top .15s ease; /* subtle slide instead of instant teleport */
+    transition: left .15s ease, top .15s ease;
   }
   .btn-no:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
 
@@ -280,36 +280,57 @@
   const card    = document.getElementById('mainCard');
   const overlay = document.getElementById('celebOverlay');
 
-  // ── position No button next to Yes initially (viewport coords) ──
-  (function initNoBtn(){
-    const yesR = btnYes.getBoundingClientRect();
-    btnNo.style.left = (yesR.right + 20) + 'px';
-    btnNo.style.top  = yesR.top + 'px';
-  })();
+  // No button starts static inside flex — sits beside Yes naturally.
+  // On first dodge we pull it out into position:fixed so it can jump freely.
+  let escaped = false;
 
-  // ── No button dodge — jumps to a random spot inside the viewport ──
+  // ── track mouse position globally ──
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  document.addEventListener('mousemove', function(e){
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  // ── No button dodge ──
   let attempts = 0;
+  let lastDodgeTime = 0;
   btnNo.addEventListener('mouseenter', dodge);
   btnNo.addEventListener('mousemove',  dodge);
 
   function dodge(){
+    const now = Date.now();
+    if(now - lastDodgeTime < 150) return;
+    lastDodgeTime = now;
+
+    // first dodge: switch from static (flex) to fixed (viewport) 
+    if(!escaped){
+      escaped = true;
+      btnNo.style.position = 'fixed';
+    }
+
     attempts++;
 
-    const btnW = btnNo.offsetWidth;
-    const btnH = btnNo.offsetHeight;
-    const vW   = window.innerWidth;
-    const vH   = window.innerHeight;
-
-    // safe zone: button stays fully inside the viewport with 16px margin on every edge
+    const btnW   = btnNo.offsetWidth;
+    const btnH   = btnNo.offsetHeight;
+    const vW     = window.innerWidth;
+    const vH     = window.innerHeight;
     const margin = 16;
-    const minX = margin;
-    const maxX = vW - btnW - margin;
-    const minY = margin;
-    const maxY = vH - btnH - margin;
+    const minDist = 300;
 
-    // random position clamped to safe zone
-    const x = minX + Math.random() * (maxX - minX);
-    const y = minY + Math.random() * (maxY - minY);
+    let x, y, tries = 0;
+
+    do {
+      x = margin + Math.random() * (vW - btnW - margin * 2);
+      y = margin + Math.random() * (vH - btnH - margin * 2);
+
+      const cx   = x + btnW / 2;
+      const cy   = y + btnH / 2;
+      const dist = Math.sqrt((cx - mouseX) ** 2 + (cy - mouseY) ** 2);
+
+      tries++;
+      if(dist >= minDist) break;
+    } while(tries < 30);
 
     btnNo.style.left = x + 'px';
     btnNo.style.top  = y + 'px';
