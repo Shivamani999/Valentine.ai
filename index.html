@@ -120,7 +120,9 @@
   .btn-no {
     background: var(--blush); color: var(--rose-dark);
     box-shadow: 0 2px 10px rgba(0,0,0,.08);
-    position: absolute;
+    position: fixed;  /* fixed to viewport so it can jump anywhere on screen */
+    z-index: 10;
+    transition: left .15s ease, top .15s ease; /* subtle slide instead of instant teleport */
   }
   .btn-no:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
 
@@ -278,29 +280,41 @@
   const card    = document.getElementById('mainCard');
   const overlay = document.getElementById('celebOverlay');
 
-  // ── position No button next to Yes initially ──
+  // ── position No button next to Yes initially (viewport coords) ──
   (function initNoBtn(){
-    const rowR  = btnRow.getBoundingClientRect();
-    const yesR  = btnYes.getBoundingClientRect();
-    btnNo.style.left = (yesR.right - rowR.left + 20) + 'px';
-    btnNo.style.top  = '0px';
+    const yesR = btnYes.getBoundingClientRect();
+    btnNo.style.left = (yesR.right + 20) + 'px';
+    btnNo.style.top  = yesR.top + 'px';
   })();
 
-  // ── No button dodge ──
+  // ── No button dodge — jumps to a random spot inside the viewport ──
   let attempts = 0;
   btnNo.addEventListener('mouseenter', dodge);
   btnNo.addEventListener('mousemove',  dodge);
 
   function dodge(){
     attempts++;
-    const cardRect = card.getBoundingClientRect();
-    const maxW = cardRect.width  - btnNo.offsetWidth  - 24;
-    const maxH = cardRect.height - btnNo.offsetHeight - 24;
-    let x = Math.max(0, Math.min(Math.random()*maxW, maxW));
-    let y = Math.max(0, Math.min(Math.random()*maxH - btnNo.offsetHeight, maxH));
-    btnNo.style.left = x+'px';
-    btnNo.style.top  = y+'px';
-    if(attempts===1) noHint.classList.add('visible');
+
+    const btnW = btnNo.offsetWidth;
+    const btnH = btnNo.offsetHeight;
+    const vW   = window.innerWidth;
+    const vH   = window.innerHeight;
+
+    // safe zone: button stays fully inside the viewport with 16px margin on every edge
+    const margin = 16;
+    const minX = margin;
+    const maxX = vW - btnW - margin;
+    const minY = margin;
+    const maxY = vH - btnH - margin;
+
+    // random position clamped to safe zone
+    const x = minX + Math.random() * (maxX - minX);
+    const y = minY + Math.random() * (maxY - minY);
+
+    btnNo.style.left = x + 'px';
+    btnNo.style.top  = y + 'px';
+
+    if(attempts === 1) noHint.classList.add('visible');
   }
 
   // ══════════════════════════════════════════════════
