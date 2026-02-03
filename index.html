@@ -121,13 +121,6 @@
   }
   .btn-no:hover { box-shadow: 0 4px 16px rgba(0,0,0,.12); }
 
-  .no-hint {
-    margin-top: 28px; font-size: 0.88rem;
-    color: var(--text-light);
-    opacity: 0; transition: opacity .4s ease;
-  }
-  .no-hint.visible { opacity: 1; }
-
   .celebration-overlay {
     position: fixed; inset: 0;
     background: linear-gradient(135deg, #fff0f3 0%, #fdf6f0 50%, #fff0f3 100%);
@@ -190,6 +183,115 @@
     40%  { opacity: .9; }
     100% { transform: var(--sp-end) scale(0); opacity: 0; }
   }
+
+  /* ══════════════════════════════════════════════════
+     LOVE SCENERY (bounces in first after Yes click)
+     ══════════════════════════════════════════════════ */
+  .scenery-overlay {
+    position: fixed; inset: 0;
+    background: linear-gradient(to bottom, #ffd6e8 0%, #ffe4f0 40%, #fff5f8 100%);
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .5s ease;
+  }
+  .scenery-overlay.show { opacity: 1; pointer-events: auto; }
+
+  .scenery-container {
+    position: relative;
+    transform: scale(0);
+    animation: bounceIn .8s cubic-bezier(.68,-0.55,.27,1.55) forwards;
+  }
+  @keyframes bounceIn {
+    0%   { transform: scale(0) rotate(-5deg); }
+    60%  { transform: scale(1.08) rotate(2deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  /* scenic illustration - couple silhouette */
+  .couple-scene {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin-bottom: 24px;
+  }
+
+  /* sunset circle background */
+  .sunset-bg {
+    position: absolute;
+    width: 200px; height: 200px;
+    top: 40px; left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: linear-gradient(to bottom, #ff9a9e 0%, #fad0c4 100%);
+    box-shadow: 0 0 60px rgba(255,154,158,.4);
+  }
+
+  /* couple silhouette */
+  .couple {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    font-size: 7rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,.15));
+    z-index: 2;
+  }
+
+  /* floating hearts around couple */
+  .scene-heart {
+    position: absolute;
+    font-size: 1.8rem;
+    animation: floatHeart 3s ease-in-out infinite;
+  }
+  .scene-heart:nth-child(1) { top: 20px;  left: 20px;  animation-delay: 0s; }
+  .scene-heart:nth-child(2) { top: 40px;  right: 30px; animation-delay: .5s; }
+  .scene-heart:nth-child(3) { top: 100px; left: 10px;  animation-delay: 1s; }
+  .scene-heart:nth-child(4) { top: 90px;  right: 15px; animation-delay: 1.5s; }
+
+  @keyframes floatHeart {
+    0%, 100% { transform: translateY(0) scale(1); opacity: .6; }
+    50%      { transform: translateY(-12px) scale(1.1); opacity: 1; }
+  }
+
+  /* stars scattered */
+  .scene-star {
+    position: absolute;
+    font-size: 1.2rem;
+    animation: twinkle 2s ease-in-out infinite;
+  }
+  .scene-star:nth-child(5) { top: 10px;  left: 60px;  animation-delay: 0s; }
+  .scene-star:nth-child(6) { top: 30px;  right: 70px; animation-delay: .7s; }
+  .scene-star:nth-child(7) { top: 120px; left: 40px;  animation-delay: 1.4s; }
+  .scene-star:nth-child(8) { top: 140px; right: 50px; animation-delay: 2.1s; }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: .3; transform: scale(.8); }
+    50%      { opacity: 1; transform: scale(1.2); }
+  }
+
+  .scenery-text {
+    text-align: center;
+    animation: fadeInUp .6s ease .3s both;
+  }
+  .scenery-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem; font-weight: 700;
+    color: var(--rose-dark);
+    margin-bottom: 8px;
+  }
+  .scenery-text p {
+    font-size: 1.15rem;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 </style>
 </head>
 <body>
@@ -205,10 +307,32 @@
       <button class="btn btn-yes" id="btnYes">Yes</button>
       <button class="btn btn-no"  id="btnNo">No</button>
     </div>
-    <p class="no-hint" id="noHint">Nice try… but that button doesn't want to cooperate 😉</p>
   </div>
 </div>
 
+<!-- Love Scenery (shows first after Yes click) -->
+<div class="scenery-overlay" id="sceneryOverlay">
+  <div class="scenery-container">
+    <div class="couple-scene">
+      <div class="sunset-bg"></div>
+      <div class="couple">💑</div>
+      <span class="scene-heart">💕</span>
+      <span class="scene-heart">💖</span>
+      <span class="scene-heart">💗</span>
+      <span class="scene-heart">💝</span>
+      <span class="scene-star">✨</span>
+      <span class="scene-star">✨</span>
+      <span class="scene-star">✨</span>
+      <span class="scene-star">✨</span>
+    </div>
+    <div class="scenery-text">
+      <h2>Perfect! 💝</h2>
+      <p>You made the right choice</p>
+    </div>
+  </div>
+</div>
+
+<!-- Celebration overlay (shows after scenery) -->
 <div class="celebration-overlay" id="celebOverlay">
   <div class="glow-ring"></div>
   <div class="celeb-heart">💝</div>
@@ -222,8 +346,8 @@
 (function(){
   const btnNo   = document.getElementById('btnNo');
   const btnYes  = document.getElementById('btnYes');
-  const noHint  = document.getElementById('noHint');
   const card    = document.getElementById('mainCard');
+  const scenery = document.getElementById('sceneryOverlay');
   const overlay = document.getElementById('celebOverlay');
 
   let escaped = false, cachedBtnW = 0, cachedBtnH = 0;
@@ -233,6 +357,22 @@
   let attempts = 0, lastDodgeTime = 0;
   btnNo.addEventListener('mouseenter', dodge);
   btnNo.addEventListener('mousemove',  dodge);
+
+  // ── playful messages that replace "No" each time ──
+  const buttonMessages = [
+    "No",
+    "Really?? 🥺",
+    "Try again 🥰",
+    "Nope! 💕",
+    "Not yet 😏",
+    "Sure? 💖",
+    "Maybe… 😘",
+    "Still no 😂",
+    "Click Yes 👀",
+    "Come on 🙈",
+    "Seriously? 😜",
+    "Yes is better 💝"
+  ];
 
   function dodge(){
     const now = Date.now();
@@ -278,20 +418,31 @@
     y = Math.max(safeMinY, Math.min(y, safeMaxY));
     btnNo.style.left = x+'px';
     btnNo.style.top  = y+'px';
-    if(attempts === 1) noHint.classList.add('visible');
+    
+    // change button text to next message
+    btnNo.textContent = buttonMessages[attempts % buttonMessages.length];
   }
 
   btnYes.addEventListener('click', function(){
+    // fade out card
     card.style.transition = 'opacity .4s ease, transform .4s ease';
     card.style.opacity    = '0';
     card.style.transform  = 'scale(.92)';
 
     setTimeout(function(){
       card.style.display = 'none';
-      overlay.classList.add('show');
-      spawnBurstHearts(overlay);
-      spawnFloatingHearts(overlay);
-      spawnSparkles(overlay);
+      
+      // show scenery with bounce animation
+      scenery.classList.add('show');
+      
+      // after 2.5s, transition to celebration
+      setTimeout(function(){
+        scenery.classList.remove('show');
+        overlay.classList.add('show');
+        spawnBurstHearts(overlay);
+        spawnFloatingHearts(overlay);
+        spawnSparkles(overlay);
+      }, 2500);
     }, 420);
   });
 
