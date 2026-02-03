@@ -1,45 +1,29 @@
-# Valentine's Site — Deployment Guide
+# Valentine Site — Standalone Version
 
-## Files in this folder
-| File          | What it does                                  |
-|---------------|-----------------------------------------------|
-| index.html    | The entire site (question + celebration)      |
-| vercel.json   | Tells Vercel how to serve it                  |
-| README.md     | This file                                     |
+## What it does
 
----
+- Girl opens the site
+- Sees "Will you be my Valentine?" with Yes and No buttons
+- No button runs away when she tries to click it (stays inside the card box)
+- She clicks Yes → full-screen celebration with hearts and sparkles
 
-## Deploy to Vercel (free, no credit card)
+**No database, no backend, no Firebase.** Just a single HTML file.
 
-### Step 1 — Create a GitHub repo
-1. Go to https://github.com/new
-2. Name it anything (e.g. `valentine-site`)
-3. Click **Create repository**
-4. Upload the three files above (`index.html`, `vercel.json`, `README.md`) into the repo root
-   - Click **Add file → Upload file**, drag all three in, commit
+## How to use
 
-### Step 2 — Deploy on Vercel
-1. Go to https://vercel.com and sign up (free)
-2. Click **New Project**
-3. Click **Import** → select your GitHub repo `valentine-site`
-4. Click **Deploy** (no settings to change — Vercel auto-detects it)
-5. Vercel gives you a live URL like: `https://valentine-site-abc123.vercel.app`
+### Option 1 — Open locally (no deployment needed)
+Just double-click `index.html` — opens in your browser, works fully offline.
 
-### Step 3 — Share the link
-Send that URL to your person. That's it.
+### Option 2 — Deploy to Vercel (get a shareable link)
+1. Push `index.html` and `vercel.json` to a GitHub repo
+2. Go to https://vercel.com → New Project → import your repo → Deploy
+3. You get a live URL like: `https://valentine-abc123.vercel.app`
+4. Send that link to her
 
----
+## Files
 
-## Run locally (no server needed)
-Just double-click `index.html` — it opens in your browser and works fully offline.
-
----
-
-## What happens on the site
-1. Question screen with a heartbeat animation and floating petals
-2. The **No** button dodges the mouse every time you get close
-3. Click **Yes** → full-screen celebration fires:
-   - 16 hearts burst outward from center
-   - 18 hearts float upward continuously
-   - 20 sparkle dots radiate outward on a loop
-   - A pulsing glow ring pulses behind the main heart
+| File        | What it does                          |
+|-------------|---------------------------------------|
+| index.html  | The entire site (one file, no deps)   |
+| vercel.json | Config for Vercel deployment          |
+| README.md   | This file                             |
